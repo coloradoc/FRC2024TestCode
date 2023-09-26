@@ -9,12 +9,14 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 
 //Constants
 import frc.robot.Constants.ChassisConstants;
-
+import frc.robot.commands.chassis.DefaultDrive;
 //Drive train object
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+//NAVX libraries
+import com.kauailabs.navx.frc.AHRS;
 
 public class ChassisSubsystem extends SubsystemBase {
     
@@ -37,9 +39,11 @@ public class ChassisSubsystem extends SubsystemBase {
     private RelativeEncoder m_leftRearEncoder2 = m_leftRear2.getEncoder();
 
     private final MecanumDrive m_drive = new MecanumDrive(m_leftFront, m_rightFront, m_leftRear1, m_rightRear1);
+    private AHRS ahrs; 
 
 
-    public ChassisSubsystem(){
+    public ChassisSubsystem(AHRS navx2){
+        ahrs = navx2;
         m_leftFront.restoreFactoryDefaults();
         m_rightFront.restoreFactoryDefaults();
         m_rightRear1.restoreFactoryDefaults();
@@ -104,7 +108,7 @@ public class ChassisSubsystem extends SubsystemBase {
     }
 
     //Called by autonomous commands
-    public void drive(double xSpeed, double zRotation){
+   // public void drive(double xSpeed, double zRotation, boolean b, double d){
         //Safety mode
         /*if(xSpeed>0.5){
             xSpeed = 0.5;
@@ -128,16 +132,16 @@ public class ChassisSubsystem extends SubsystemBase {
         // }
 
 
-        m_drive.driveCartesian(xSpeed, xSpeed, zRotation);
-    }
+      //  m_drive.driveCartesian(xSpeed, xSpeed, zRotation);
+   //}
 
     //Called by Default drive
-    public void drive(double xSpeed, double zRotation, boolean turbo){
+    public void drive(double xSpeed, double ySpeed, boolean turbo, double twist){
         if(turbo){
-            m_drive.driveCartesian(xSpeed, xSpeed, zRotation);
+            m_drive.driveCartesian(xSpeed, ySpeed, twist, ahrs.getRotation2d());
         }
         else{
-            m_drive.driveCartesian(xSpeed*.8, xSpeed*.8, zRotation*.8);
+            m_drive.driveCartesian(xSpeed*.8, ySpeed*.8, twist*.8, ahrs.getRotation2d());
         }
     }
 
@@ -192,4 +196,6 @@ public class ChassisSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("AverageRotation",this.getAverageEncoderRotation());
         SmartDashboard.putNumber("AveragePosition(inch)",this.getAverageEncoderDistanceInches());
     }
+
+
 }

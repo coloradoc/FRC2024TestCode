@@ -87,12 +87,12 @@ import java.util.concurrent.TimeUnit;
 public class RobotContainer {
   
   //Subsystems:
-  private final ChassisSubsystem m_chassisSubsystem = new ChassisSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final ClawSubsystem m_clawSubsystem = new ClawSubsystem();
   private final NavSubsystem m_navSubsystem;
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();
-  private final LEDSubsystem m_LEDSubsystem;
+  private final ChassisSubsystem m_chassisSubsystem; 
+
   
   
   //Controllers:
@@ -108,19 +108,43 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
+    //Enable the NavX
+    try {
+      ahrs = new AHRS(SPI.Port.kMXP);
+      ahrs.enableLogging(true);
+    } 
+    catch (RuntimeException ex) {
+      DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
+    }
 
+    //Get the initial pitch of the NavX (Since the robot will be slightly tilted)
+    try {
+      TimeUnit.SECONDS.sleep(2);
+      kInitialPitchOffset = ahrs.getPitch();
+    } 
+    catch (InterruptedException e) {
+      DriverStation.reportError("An error in getting the navX Pitch: " + e.getMessage(), true);
+    }
+
+    //Pass NavX and initial pitch into Nav subsystem
+    m_navSubsystem = new NavSubsystem(ahrs, kInitialPitchOffset);
+    m_chassisSubsystem = new ChassisSubsystem(ahrs);
+    
+    //Pass NavX into LED subsystem so we can have the cool rainbow effect
     //Start-up of USB cameras for drivers
     CameraServer.startAutomaticCapture();
 
     //Configure the button bindings
     configureBindings();
-
     m_chassisSubsystem.setDefaultCommand(
       new DefaultDrive(m_chassisSubsystem,
-      () -> -m_driverController.getLeftY(),
-      () -> m_driverController.getRightX(),
-      () -> m_driverController.getRightTriggerAxis() > IOConstants.kTriggerThreshold)
+        () -> -m_driverController.getLeftX(),
+        () -> m_driverController.getLeftY(),
+        () -> m_driverController.getRightTriggerAxis() > IOConstants.kTriggerThreshold,
+        () -> m_driverController.getRightX()
+      )
     );
+    
 
     m_visionSubsystem.setDefaultCommand(new DefaultLimelightPipeline(m_visionSubsystem));
 
@@ -169,13 +193,13 @@ public class RobotContainer {
     //Y button: auto aim (high pole) (i set it to be on a button press, not held)
     new JoystickButton(m_coDriverController, Button.kB.value)
     .toggleOnTrue(
-      new AutoAlignTop(m_visionSubsystem, m_chassisSubsystem, m_LEDSubsystem)
+      new AutoAlignTop(m_visionSubsystem, m_chassisSubsystem)
     );
 
     //A button: auto aim (mide pole)
     new JoystickButton(m_driverController, Button.kA.value)
     .whileTrue(
-      new AutoAlignBottom(m_visionSubsystem, m_chassisSubsystem, m_LEDSubsystem)
+      new AutoAlignBottom(m_visionSubsystem, m_chassisSubsystem)
     );
 
     //Dpad up: reset encoders (for testing purposes)
@@ -231,6 +255,7 @@ public class RobotContainer {
      *
      * @return the command to run in autonomous
      */
+  }
   public Command getAutonomousCommand() {
     //TODO: add a shuffleboard selector that doesn't break the robot
     return m_autonChooser.getSelected();
@@ -238,3 +263,4 @@ public class RobotContainer {
     //return new AutonOnePieceSide(m_chassisSubsystem, m_clawSubsystem, m_armSubsystem);
   }
 }
+

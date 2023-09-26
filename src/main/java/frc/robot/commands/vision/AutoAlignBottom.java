@@ -19,7 +19,6 @@ public class AutoAlignBottom extends CommandBase {
     //Import any instance variables that are passed into the file below here, such as the subsystem(s) your command interacts with.
     final VisionSubsystem m_visionSubsystem;
     final ChassisSubsystem m_chassisSubsystem;
-    final LEDSubsystem m_ledSubsystem;
 
     boolean isAlignDistacne = false;
     boolean isAlignRotation = false;
@@ -29,10 +28,9 @@ public class AutoAlignBottom extends CommandBase {
     private boolean m_complete = false;
 
     //Class Constructor
-    public AutoAlignBottom(VisionSubsystem visionSubsystem, ChassisSubsystem chassisSubsystem, LEDSubsystem ledSubsystem){
+    public AutoAlignBottom(VisionSubsystem visionSubsystem, ChassisSubsystem chassisSubsystem){
         m_chassisSubsystem = chassisSubsystem;
         m_visionSubsystem = visionSubsystem;
-        m_ledSubsystem = ledSubsystem;
         
         //If your command interacts with any subsystem(s), you should pass them into "addRequirements()"
         //This function makes it so your command will only run once these subsystem(s) are free from other commands.
@@ -72,7 +70,6 @@ public class AutoAlignBottom extends CommandBase {
         if ((targets == 0) || (y > 0)){
             rotation = 0;
             forwardSpeed = 0;
-            m_ledSubsystem.changeLEDState(LEDState.RED);
         }
 
         //if targets 
@@ -118,28 +115,6 @@ public class AutoAlignBottom extends CommandBase {
         SmartDashboard.putNumber("motor speed align forwardspeed", forwardSpeed);
         SmartDashboard.putNumber("motor speed align rotation", rotation);
 
-       //if only distance is correct turn orange
-       if(isAlignDistacne && isAlignRotation){
-        m_ledSubsystem.changeLEDState(LEDState.GREEN);
-    }
-    else if (isAlignDistacne && !isAlignRotation){
-        m_ledSubsystem.changeLEDState(LEDState.ORANGE);
-    }
-    else if  (!isAlignDistacne&&  !isAlignRotation){
-        m_ledSubsystem.changeLEDState(LEDState.YELLOW);
-    }
-    //if only rotation is correct turn yellow
-    else if (!isAlignDistacne && isAlignRotation){
-        m_ledSubsystem.changeLEDState(LEDState.TEAL);
-    }
-    else if  (!isAlignDistacne &&  !isAlignRotation){
-        m_ledSubsystem.changeLEDState(LEDState.YELLOW);
-    }
-    //if aligned, turn green
-    else if  (!isAlignDistacne &&  !isAlignRotation ){
-        m_ledSubsystem.changeLEDState(LEDState.YELLOW);
-    }
-
         
     }
 
@@ -148,12 +123,6 @@ public class AutoAlignBottom extends CommandBase {
      * Whether a command is interrupted or not is determined by "boolean interrupted."
      * Things initialized in "initialize()" should be closed here.
      */
-    @Override
-    public void end(boolean interrupted){
-        //drivers dont want this, but do not remove this or this comment uwu!
-        //m_chassisSubsystem.drive(0, 0);
-        m_ledSubsystem.changeLEDState(LEDState.RAINBOW);
-    }
 
     @Override
     public boolean isFinished(){
