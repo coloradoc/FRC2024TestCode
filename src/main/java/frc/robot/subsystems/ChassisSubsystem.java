@@ -15,72 +15,83 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 //NAVX libraries
 import com.kauailabs.navx.frc.AHRS;
 
 public class ChassisSubsystem extends SubsystemBase {
     
-    private final CANSparkMax m_leftFront = new CANSparkMax(ChassisConstants.kLeftFrontPort, MotorType.kBrushless);
-    private final CANSparkMax m_leftRear1 = new CANSparkMax(ChassisConstants.kLeftRearPort1, MotorType.kBrushless);
-    private final CANSparkMax m_leftRear2 = new CANSparkMax(ChassisConstants.kLeftRearPort2, MotorType.kBrushless);
-    MotorControllerGroup m_left = new MotorControllerGroup(m_leftFront, m_leftRear1, m_leftRear2);
+    private final TalonFX test = new TalonFX(0)
+    TalonFX grou
+    private final TalonFX m_leftFront1 = new TalonFX(ChassisConstants.kLeftFrontPort);
+    private final TalonFX m_leftFront2 = new TalonFX(ChassisConstants.kLeftFrontPort1);
+    private final TalonFX m_leftRear1 = new TalonFX(ChassisConstants.kLeftRearPort);
+    private final TalonFX m_leftRear2 = new TalonFX(ChassisConstants.kLeftRearPort1);
+    MotorControllerGroup m_leftTop = new MotorControllerGroup(m_leftFront1, m_leftFront2);
+    MotorControllerGroup m_leftBottom = new MotorControllerGroup(m_leftRear1, m_leftRear2);
 
-    private final CANSparkMax m_rightFront = new CANSparkMax(ChassisConstants.kRightFrontPort, MotorType.kBrushless);
-    private final CANSparkMax m_rightRear1 = new CANSparkMax(ChassisConstants.kRightRearPort1, MotorType.kBrushless);
-    private final CANSparkMax m_rightRear2 = new CANSparkMax(ChassisConstants.kRightRearPort2, MotorType.kBrushless);
-    MotorControllerGroup m_right = new MotorControllerGroup(m_rightFront, m_rightRear1, m_rightRear2);
+    private final TalonFX m_rightFront1 = new TalonFX(ChassisConstants.kRightFrontPort);
+    private final TalonFX m_rightFront2 = new TalonFX(ChassisConstants.kRightFrontPort1);
+    private final TalonFX m_rightRear1 = new TalonFX(ChassisConstants.kRightRearPort);
+    private final TalonFX m_rightRear2 = new TalonFX(ChassisConstants.kRightRearPort1);
+    MotorControllerGroup m_rightTop = new MotorControllerGroup(m_rightFront1, m_rightFront2);
+    MotorControllerGroup m_rightBottom = new MotorControllerGroup(m_rightRear1, m_rightRear2);
 
     //Get Encoders
-    private RelativeEncoder m_leftFrontEncoder = m_leftFront.getEncoder();
-    private RelativeEncoder m_rightFrontEncoder = m_rightFront.getEncoder();
+    private RelativeEncoder m_leftFrontEncoder = m_leftFront1.getEncoder();
+    private RelativeEncoder m_rightFrontEncoder = m_rightFront2.getEncoder();
     private RelativeEncoder m_rightRearEncoder1 = m_rightRear1.getEncoder();
     private RelativeEncoder m_rightRearEncoder2 = m_rightRear2.getEncoder();
     private RelativeEncoder m_leftRearEncoder1 = m_leftRear1.getEncoder();
     private RelativeEncoder m_leftRearEncoder2 = m_leftRear2.getEncoder();
 
-    private final MecanumDrive m_drive = new MecanumDrive(m_leftFront, m_rightFront, m_leftRear1, m_rightRear1);
+
+    
+    private final MecanumDrive m_drive = new MecanumDrive(m_leftFront1, m_leftRear1, m_rightFront1, m_rightRear1);
+    private final MecanumDrive m_drive1 = new MecanumDrive(m_leftFront2, m_leftRear2, m_rightFront2, m_rightRear2);
     private AHRS ahrs; 
 
 
     public ChassisSubsystem(AHRS navx2){
         ahrs = navx2;
-        m_leftFront.restoreFactoryDefaults();
-        m_rightFront.restoreFactoryDefaults();
+        m_leftFront1.restoreFactoryDefaults();
+        m_rightFront2.restoreFactoryDefaults();
         m_rightRear1.restoreFactoryDefaults();
         m_rightRear2.restoreFactoryDefaults();
         m_leftRear1.restoreFactoryDefaults();
         m_leftRear2.restoreFactoryDefaults();
 
-        m_leftFront.setOpenLoopRampRate(0.25);
-        m_rightFront.setOpenLoopRampRate(0.25);
+        m_leftFront1.setOpenLoopRampRate(0.25);
+        m_rightFront2.setOpenLoopRampRate(0.25);
         m_rightRear1.setOpenLoopRampRate(0.25);
         m_rightRear2.setOpenLoopRampRate(0.25);
         m_leftRear1.setOpenLoopRampRate(0.25);
         m_leftRear2.setOpenLoopRampRate(0.25);
 
-        m_leftFront.setSmartCurrentLimit(ChassisConstants.kCurrentLimit);
-        m_rightFront.setSmartCurrentLimit(ChassisConstants.kCurrentLimit);
+        m_leftFront1.setSmartCurrentLimit(ChassisConstants.kCurrentLimit);
+        m_rightFront2.setSmartCurrentLimit(ChassisConstants.kCurrentLimit);
         m_rightRear1.setSmartCurrentLimit(ChassisConstants.kCurrentLimit);
         m_rightRear2.setSmartCurrentLimit(ChassisConstants.kCurrentLimit);
         m_leftRear1.setSmartCurrentLimit(ChassisConstants.kCurrentLimit);
         m_leftRear2.setSmartCurrentLimit(ChassisConstants.kCurrentLimit);
         
-        m_leftFront.setIdleMode(IdleMode.kCoast);
-        m_rightFront.setIdleMode(IdleMode.kCoast);
+        m_leftFront1.setIdleMode(IdleMode.kCoast);
+        m_rightFront2.setIdleMode(IdleMode.kCoast);
         m_rightRear1.setIdleMode(IdleMode.kCoast);
         m_rightRear2.setIdleMode(IdleMode.kCoast);
         m_leftRear1.setIdleMode(IdleMode.kCoast);
         m_leftRear2.setIdleMode(IdleMode.kCoast);
         
-        m_leftFront.setInverted(false);
-        m_rightFront.setInverted(true);
+        m_leftFront1.setInverted(false);
+        m_rightFront2.setInverted(true);
         m_leftRear1.setInverted(false);
         m_leftRear2.setInverted(false);
         m_rightRear1.setInverted(true);
         m_rightRear2.setInverted(true);
 
-        m_leftFront.burnFlash();
-        m_rightFront.burnFlash();
+        m_leftFront1.burnFlash();
+        m_rightFront2.burnFlash();
         m_leftRear1.burnFlash();
         m_leftRear2.burnFlash();
         m_rightRear1.burnFlash();
@@ -90,8 +101,8 @@ public class ChassisSubsystem extends SubsystemBase {
     }
 
     public void setBrakeMode(){
-        m_leftFront.setIdleMode(IdleMode.kBrake);
-        m_rightFront.setIdleMode(IdleMode.kBrake);
+        m_leftFront1.setIdleMode(IdleMode.kBrake);
+        m_rightFront2.setIdleMode(IdleMode.kBrake);
         m_rightRear1.setIdleMode(IdleMode.kBrake);
         m_rightRear2.setIdleMode(IdleMode.kBrake);
         m_leftRear1.setIdleMode(IdleMode.kBrake);
@@ -99,8 +110,8 @@ public class ChassisSubsystem extends SubsystemBase {
     }
 
     public void setCoastMode(){
-        m_leftFront.setIdleMode(IdleMode.kCoast);
-        m_rightFront.setIdleMode(IdleMode.kCoast);
+        m_leftFront1.setIdleMode(IdleMode.kCoast);
+        m_rightFront2.setIdleMode(IdleMode.kCoast);
         m_rightRear1.setIdleMode(IdleMode.kCoast);
         m_rightRear2.setIdleMode(IdleMode.kCoast);
         m_leftRear1.setIdleMode(IdleMode.kCoast);
@@ -185,8 +196,8 @@ public class ChassisSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("LR2_Enc",m_leftRearEncoder2.getPosition());
         
 
-        SmartDashboard.putNumber("LF_Speed",m_leftFront.get());
-        SmartDashboard.putNumber("RF_Speed",m_rightFront.get());
+        SmartDashboard.putNumber("LF_Speed",m_leftFront1.get());
+        SmartDashboard.putNumber("RF_Speed",m_rightFront2.get());
         SmartDashboard.putNumber("RR1_Speed",m_rightRear1.get());
         SmartDashboard.putNumber("RR2_Speed",m_rightRear2.get());
         SmartDashboard.putNumber("LR1_Speed",m_leftRear1.get());

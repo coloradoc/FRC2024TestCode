@@ -19,12 +19,14 @@ package frc.robot;
 public final class Constants {
 
     public static final class ChassisConstants {
-        public static final int kLeftFrontPort = 2;
-        public static final int kRightFrontPort = 3;
-        public static final int kRightRearPort1 = 5;
-        public static final int kRightRearPort2 = 6;
-        public static final int kLeftRearPort1 = 4;
-        public static final int kLeftRearPort2 = 7;
+        public static final int kLeftFrontPort = 2; //done
+        public static final int kLeftFrontPort1 = 3; //done
+        public static final int kRightFrontPort = 7; //done
+        public static final int kRightFrontPort1 = 6; //done
+        public static final int kRightRearPort = 4; //done
+        public static final int kRightRearPort1 = 5; //done
+        public static final int kLeftRearPort = 1; //done
+        public static final int kLeftRearPort1 = 0; //done
 
         public static final int kCurrentLimit = 40; // 40A current limit for motors 
 
